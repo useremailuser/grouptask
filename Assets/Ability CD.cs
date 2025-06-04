@@ -23,19 +23,25 @@ public class AbilityCD : MonoBehaviour
         
         if (Input.GetKeyDown("space"))
         {
-            charges -= 1;
-            displayText.text = charges.ToString();
+            if(charges > 0)
+            {
+                charges -= 1;
+                displayText.text = charges.ToString();
 
-            Debug.Log("space");
+                Debug.Log("space");
+            }
+
+            if (charges < 3)
+            {
+                targetTime -= Time.deltaTime;
+
+
+            }
+
+
+
+
         }
-        if (charges < 3)
-        {
-            targetTime -= Time.deltaTime;
-           
-            
-        }
-
-
 
         if (targetTime <= 0.0f)
         {
@@ -43,7 +49,6 @@ public class AbilityCD : MonoBehaviour
             AddCD();
             Debug.Log("addCD");
         }
-
     }
     void AddCD()
     { 
