@@ -11,7 +11,7 @@ public class ThirdPersonController : MonoBehaviour
     public Transform modelMesh;
 
     private Rigidbody rb;
-    
+
 
     //pD will chase mV
     private Vector3 movementVector, playerDirection;
@@ -25,28 +25,41 @@ public class ThirdPersonController : MonoBehaviour
     public float dashLength = 3.0f;
     public float dashForce = 4f;
 
-    public float targetTime = 3.0f;
+    public float targetTime = 1f;
     public float charges = 3;
     public Transform bulletSpawn;
+    public float dashtime = 0.2f;
+
+    public bool dashing = false;
+
+    public bool Stationary = true;
+    public Vector3 vel;
+    float xMovement = 0;
 
     void Awake() {
         rb = GetComponent<Rigidbody>();
         ani = modelMesh.GetComponent<Animator>();
+
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         playerDirection = transform.forward;
+
     }
 
     // Update is called once per frame
     void Update()
     {
+ 
+        //dashing = false;
+        if (dashtime == 0.5f)
+        {
+
+        }
 
 
-
-    
         //grounded check
         grounded = Physics.BoxCast(transform.position + Vector3.up, Vector3.one * 0.5f, Vector3.down, modelMesh.rotation, 0.7f);
 
@@ -69,8 +82,8 @@ public class ThirdPersonController : MonoBehaviour
             }
         }
         // WASD calculated
-        movementVector = ( forwardFlat * Input.GetAxis("Vertical") ) 
-                        + ( sideFlat * Input.GetAxis("Horizontal") );
+        movementVector = (forwardFlat * Input.GetAxis("Vertical"))
+                        + (sideFlat * Input.GetAxis("Horizontal"));
         movementVector.Normalize();
 
         //Rotating player direction towards the movement vector
@@ -85,30 +98,81 @@ public class ThirdPersonController : MonoBehaviour
         {
             if (charges > 0)
             {
-                rb.AddForce(bulletSpawn.forward * 90, ForceMode.Force);
+                if (dashing == false)
+                {
                 charges -= 1;
                 displayText.text = charges.ToString();
+                dashing = true;
+                rb.linearVelocity = new Vector3(0, 0, 0);
+                rb.AddForce(bulletSpawn.forward * 20, ForceMode.Impulse);
+                }
 
-                Debug.Log("space");
+
             }
+            return;
 
         }
+        if (dashing == true)
+        {
+            dashtime -= Time.deltaTime;
+            Stationary = false;
+            rb.useGravity = false;
+
+
+        }
+        if (dashtime <= 0f)
+        {
+
+            dashing = false;
+            dashtime = 0.2f;
+            rb.linearVelocity = new Vector3(0, 0, 0);
+        }
+
         if (charges < 3)
         {
             targetTime -= Time.deltaTime;
-           
-            
+
+
         }
         if (targetTime <= 0.0f)
         {
 
             AddCD();
             Debug.Log("addCD");
+            displayText.text = charges.ToString();
         }
         //Jumping if SPACE pressed AND we're grounded
         if (Input.GetKeyDown(KeyCode.Space) && grounded) {
-            rb.AddForce(0,jumpForce,0,ForceMode.Impulse);
+            rb.AddForce(0, jumpForce, 0, ForceMode.Impulse);
         }
+        if ((Input.GetKey(KeyCode.A)) || (Input.GetKey(KeyCode.D)))
+        {
+          
+               Stationary = false;
+            
+            
+        }
+        else
+        {
+            if (dashing == false)
+            {
+               Stationary = true;
+            }
+            else
+            {
+
+                Stationary = false;
+                
+            }
+
+        }
+
+        if(dashing == false)
+        {
+            rb.useGravity = true;
+        }
+
+
 
         //Lerping of SPEED towards 0, walkspeed and runspeed, given condition.
         //MOVE TOWARDS -- lerping with a set step
@@ -125,17 +189,40 @@ public class ThirdPersonController : MonoBehaviour
         //ani.SetFloat("z", Input.GetAxis("Vertical"));
         //ani.SetBool("grounded?", grounded);
     }
+    
+    void Dash()
+    {
+        charges -= 1f;
+                displayText.text = charges.ToString();
+                dashtime -= Time.deltaTime;
+                Debug.Log("space");
+        
+
+    }
     void AddCD()
     {
         charges += 1;
         Debug.Log("CDadded");
-        targetTime = 3.0f;
+        targetTime = 1f;
         displayText.text = charges.ToString();
 
     }
     void FixedUpdate() {
         //use movementvector and speed to calculate my object's movement this FixedUpdate (0.02 sec)
         //reapply the object's y velocity to retain gravity.
-        rb.linearVelocity = (movementVector * speed) + (Vector3.up * rb.linearVelocity.y);
+
+        if (dashing == false)
+        {
+            rb.linearVelocity = (movementVector * speed) + (Vector3.up * rb.linearVelocity.y);
+        }
+
+        if (Stationary == true)
+        {
+            Vector3 vel = rb.linearVelocity;
+            vel.x = xMovement;
+            rb.linearVelocity = vel;
+
+        }
     }
+
 }
