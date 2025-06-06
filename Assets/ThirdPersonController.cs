@@ -35,6 +35,8 @@ public class ThirdPersonController : MonoBehaviour
     public bool Stationary = true;
     public Vector3 vel;
     float xMovement = 0;
+    public bool IsGrounded;
+    public float distToGround;
 
     void Awake() {
         rb = GetComponent<Rigidbody>();
@@ -46,7 +48,7 @@ public class ThirdPersonController : MonoBehaviour
     void Start()
     {
         playerDirection = transform.forward;
-
+        distToGround = GetComponent<Collider>().bounds.extents.y;
     }
 
     // Update is called once per frame
@@ -61,7 +63,7 @@ public class ThirdPersonController : MonoBehaviour
 
 
         //grounded check
-        grounded = Physics.BoxCast(transform.position + Vector3.up, Vector3.one * 0.5f, Vector3.down, modelMesh.rotation, 0.7f);
+        //grounded = Physics.BoxCast(transform.position + Vector3.up, Vector3.one * 0.5f, Vector3.down, modelMesh.rotation, 0.7f);
 
         //Flattened versions of the Camera's direction. Removing their y-axis from play
         Vector3 forwardFlat = new Vector3(Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
@@ -166,13 +168,26 @@ public class ThirdPersonController : MonoBehaviour
             }
 
         }
+        if (Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f))
+        {
 
-        if(dashing == false)
+            grounded = true;
+
+
+        }
+        else
+        {
+               grounded = false;
+
+        }
+
+        if (dashing == false)
         {
             rb.useGravity = true;
         }
 
-
+        
+       
 
         //Lerping of SPEED towards 0, walkspeed and runspeed, given condition.
         //MOVE TOWARDS -- lerping with a set step
@@ -189,16 +204,7 @@ public class ThirdPersonController : MonoBehaviour
         //ani.SetFloat("z", Input.GetAxis("Vertical"));
         //ani.SetBool("grounded?", grounded);
     }
-    
-    void Dash()
-    {
-        charges -= 1f;
-                displayText.text = charges.ToString();
-                dashtime -= Time.deltaTime;
-                Debug.Log("space");
-        
 
-    }
     void AddCD()
     {
         charges += 1;
