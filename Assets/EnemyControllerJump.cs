@@ -10,11 +10,12 @@ public class EnemyControllerJump : MonoBehaviour
     private Rigidbody rb;
 
     public float distToGround;
+    public float groundTime = 0.6f;
 
     //pD will chase mV
     private Vector3 movementVector, playerDirection;
 
-    public float jumpForce = 4;
+    public float jumpForce = 1;
     public bool grounded = true;
     public Transform Player;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -45,9 +46,13 @@ public class EnemyControllerJump : MonoBehaviour
         if (grounded == true)
         {
            
+           
             
-             rb.AddForce(0, jumpForce, 0, ForceMode.Force);
-            rb.AddForce(movementVector);
+               rb.AddForce(0, jumpForce, 0, ForceMode.Force);
+               
+            
+             
+            
         }
     }
     void FixedUpdate()

@@ -14,7 +14,7 @@ public class ThirdPersonController : MonoBehaviour
 
 
     //pD will chase mV
-    private Vector3 movementVector, playerDirection;
+    public Vector3 movementVector, playerDirection;
 
     public float jumpForce = 4;
     public bool grounded = true;
@@ -38,6 +38,9 @@ public class ThirdPersonController : MonoBehaviour
     public bool IsGrounded;
     public float distToGround;
 
+    public SpriteRenderer sprite;
+    
+
     void Awake() {
         rb = GetComponent<Rigidbody>();
         ani = modelMesh.GetComponent<Animator>();
@@ -54,7 +57,16 @@ public class ThirdPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
- 
+
+        if (movementVector.x > 0)
+        {
+            sprite.flipX = false;
+        }
+        else if (movementVector.x < 0)
+        {
+            sprite.flipX = true;   
+        }
+
         //dashing = false;
         if (dashtime == 0.5f)
         {
@@ -186,8 +198,8 @@ public class ThirdPersonController : MonoBehaviour
             rb.useGravity = true;
         }
 
-        
-       
+
+
 
         //Lerping of SPEED towards 0, walkspeed and runspeed, given condition.
         //MOVE TOWARDS -- lerping with a set step
@@ -196,13 +208,9 @@ public class ThirdPersonController : MonoBehaviour
         //else
         //    speed = Mathf.MoveTowards(speed, 6, 5 * Time.deltaTime);
 
-        //Animation Updates
-        //ani.SetBool("walking?", movementVector.magnitude > 0);
-        //ani.SetBool("running?", Input.GetKey(KeyCode.LeftShift));
-        //ani.SetBool("locked?", Input.GetMouseButton(1));
-        //ani.SetFloat("x", Input.GetAxis("Horizontal"));
-        //ani.SetFloat("z", Input.GetAxis("Vertical"));
-        //ani.SetBool("grounded?", grounded);
+        Animation Updates;
+        //ani.SetBool("walking?", !Stationary);
+        //ani.SetBool("dashing?", dashing);
     }
 
     void AddCD()
