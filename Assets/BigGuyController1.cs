@@ -109,7 +109,7 @@ public class BigGuyController1 : MonoBehaviour
        
         if (groundTime > 0)
         {
-            movementVector = (Player.position - transform.position);
+            movementVector = ((Player.position - transform.position) * 0.8f);
             
         }
         if (grounded)

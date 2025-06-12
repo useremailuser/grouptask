@@ -39,6 +39,8 @@ public class ThirdPersonController : MonoBehaviour
     public float distToGround;
 
     public SpriteRenderer sprite;
+
+    Vector3 Dashdir;
     
 
     void Awake() {
@@ -81,20 +83,6 @@ public class ThirdPersonController : MonoBehaviour
         Vector3 forwardFlat = new Vector3(Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
         Vector3 sideFlat = new Vector3(Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;
 
-        {
-            if (Input.GetKey(KeyCode.A))
-
-            {
-                //rb.AddForce(-1 * 100 * Time.deltaTime, 0, 0);
-            }
-        }
-
-        {
-            if (Input.GetKey(KeyCode.D))
-            {
-                //rb.AddForce(1 * 100 * Time.deltaTime, 0, 0);
-            }
-        }
         // WASD calculated
         movementVector = (forwardFlat * Input.GetAxis("Vertical"))
                         + (sideFlat * Input.GetAxis("Horizontal"));
@@ -118,10 +106,21 @@ public class ThirdPersonController : MonoBehaviour
                 displayText.text = charges.ToString();
                 dashing = true;
                 rb.linearVelocity = new Vector3(0, 0, 0);
-                rb.AddForce(bulletSpawn.forward * 20, ForceMode.Impulse);
+                    //rb.AddForce(bulletSpawn.forward * 20, ForceMode.Impulse);
+                    if (Stationary == false)
+                    {
+                        rb.AddForce(movementVector * 20, ForceMode.Impulse);
+                    }
+                    else
+                    {
+                        dashDir = new Vector3(movementVector.x, 0, 0);
+                        rb.AddForce(dashDir * 20, ForceMode.Impulse); 
+
+                    }
+
                 }
 
-
+                    
             }
             return;
 
