@@ -18,6 +18,10 @@ public class ThirdPersonController : MonoBehaviour
 
     public float jumpForce = 4;
     public bool grounded = true;
+    public bool grounded2 = true;
+
+    public float jumpCharges = 1;
+
 
     private Animator ani;
     public TextMeshProUGUI displayText;
@@ -40,8 +44,8 @@ public class ThirdPersonController : MonoBehaviour
 
     public SpriteRenderer sprite;
 
-    Vector3 Dashdir;
-    
+    public Vector3 dashRight;
+        public Vector3 dashLeft;
 
     void Awake() {
         rb = GetComponent<Rigidbody>();
@@ -54,6 +58,8 @@ public class ThirdPersonController : MonoBehaviour
     {
         playerDirection = transform.forward;
         distToGround = GetComponent<Collider>().bounds.extents.y;
+        dashRight = new Vector3(20, 0, 0);
+        dashLeft = new Vector3(-20, 0, 0);
     }
 
     // Update is called once per frame
@@ -102,21 +108,26 @@ public class ThirdPersonController : MonoBehaviour
             {
                 if (dashing == false)
                 {
-                charges -= 1;
-                displayText.text = charges.ToString();
-                dashing = true;
-                rb.linearVelocity = new Vector3(0, 0, 0);
+                    Stationary = false;
+                    charges -= 1;
+                    displayText.text = charges.ToString();
+                    dashing = true;
+                    rb.linearVelocity = new Vector3(0, 0, 0);
                     //rb.AddForce(bulletSpawn.forward * 20, ForceMode.Impulse);
-                    if (Stationary == false)
-                    {
-                        rb.AddForce(movementVector * 20, ForceMode.Impulse);
-                    }
-                    else
-                    {
-                        dashDir = new Vector3(movementVector.x, 0, 0);
-                        rb.AddForce(dashDir * 20, ForceMode.Impulse); 
+            
+                        if (sprite.flipX == false)
+                        {
+                            Debug.Log("DLEFT");
+                            rb.AddForce(dashRight * 1, ForceMode.Impulse);
+                        }
+                        else if (sprite.flipX == true)
+                        {
+                            Debug.Log("DLEFT");
+                            rb.AddForce(dashLeft * 1, ForceMode.Impulse);
+                        }
+                        
 
-                    }
+                    
 
                 }
 
@@ -141,22 +152,33 @@ public class ThirdPersonController : MonoBehaviour
             rb.linearVelocity = new Vector3(0, 0, 0);
         }
 
-        if (charges < 3)
+        if (charges < 1)
         {
-            targetTime -= Time.deltaTime;
+            
 
 
         }
-        if (targetTime <= 0.0f)
+        if (grounded)
         {
+            if (charges < 1)
+            {
+             AddCD();
+             Debug.Log("addCD");
+             displayText.text = charges.ToString();
+            }
 
-            AddCD();
-            Debug.Log("addCD");
-            displayText.text = charges.ToString();
         }
         //Jumping if SPACE pressed AND we're grounded
-        if (Input.GetKeyDown(KeyCode.Space) && grounded) {
+        if (Input.GetKeyDown(KeyCode.Space) && grounded2 && jumpCharges > 0) {
+            Vector3 vel = rb.linearVelocity;
+            vel.y = xMovement;
+            rb.linearVelocity = vel;
             rb.AddForce(0, jumpForce, 0, ForceMode.Impulse);
+            jumpCharges -= 1;
+        }
+        if(grounded)
+        {
+            jumpCharges = 1;
         }
         if ((Input.GetKey(KeyCode.A)) || (Input.GetKey(KeyCode.D)))
         {
@@ -235,6 +257,39 @@ public class ThirdPersonController : MonoBehaviour
             vel.x = xMovement;
             rb.linearVelocity = vel;
 
+        }
+    }
+
+    void EXAMPLEUHHHHTRACERBLINK()
+    {
+        if (dashing == true)
+        {
+            dashtime -= Time.deltaTime;
+            Stationary = false;
+            rb.useGravity = false;
+
+
+        }
+        if (dashtime <= 0f)
+        {
+
+            dashing = false;
+            dashtime = 0.2f;
+            rb.linearVelocity = new Vector3(0, 0, 0);
+        }
+
+        if (charges < 3)
+        {
+            targetTime -= Time.deltaTime;
+
+
+        }
+        if (targetTime <= 0.0f)
+        {
+
+            AddCD();
+            Debug.Log("addCD");
+            displayText.text = charges.ToString();
         }
     }
 

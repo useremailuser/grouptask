@@ -480,7 +480,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 3
+  m_text: 1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -574,7 +574,7 @@ GameObject:
   - component: {fileID: 817002070}
   - component: {fileID: 817002071}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -665,11 +665,13 @@ MonoBehaviour:
   playerDirection: {x: 0, y: 0, z: 0}
   jumpForce: 8
   grounded: 1
+  grounded2: 1
+  jumpCharges: 1
   displayText: {fileID: 759927725}
   dashLength: 3
   dashForce: 4
   targetTime: 3
-  charges: 3
+  charges: 1
   bulletSpawn: {fileID: 951497927}
   dashtime: 0.2
   dashing: 0
@@ -678,6 +680,8 @@ MonoBehaviour:
   IsGrounded: 0
   distToGround: 0
   sprite: {fileID: 877979378}
+  dashRight: {x: 0, y: 0, z: 0}
+  dashLeft: {x: 0, y: 0, z: 0}
 --- !u!75 &817002070
 ConstantForce:
   m_ObjectHideFlags: 0
