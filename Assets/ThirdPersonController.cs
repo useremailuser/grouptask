@@ -167,15 +167,7 @@ public class ThirdPersonController : MonoBehaviour
              displayText.text = charges.ToString();
             }
 
-        }
-        //Jumping if SPACE pressed AND we're grounded
-        if (Input.GetKeyDown(KeyCode.Space) && grounded2 && jumpCharges > 0) {
-            Vector3 vel = rb.linearVelocity;
-            vel.y = xMovement;
-            rb.linearVelocity = vel;
-            rb.AddForce(0, jumpForce, 0, ForceMode.Impulse);
-            jumpCharges -= 1;
-        }
+
         if(grounded)
         {
             jumpCharges = 1;
@@ -258,6 +250,15 @@ public class ThirdPersonController : MonoBehaviour
             rb.linearVelocity = vel;
 
         }
+        }
+        //Jumping if SPACE pressed AND we're grounded
+        if (Input.GetKeyDown(KeyCode.Space) && grounded2 && jumpCharges > 0) {
+            Vector3 vel = rb.linearVelocity;
+            vel.y = xMovement;
+            rb.linearVelocity = vel;
+            rb.AddForce(0, jumpForce, 0, ForceMode.Impulse);
+            jumpCharges -= 1;
+        }
     }
 
     void EXAMPLEUHHHHTRACERBLINK()
@@ -287,7 +288,6 @@ public class ThirdPersonController : MonoBehaviour
         if (targetTime <= 0.0f)
         {
 
-            AddCD();
             Debug.Log("addCD");
             displayText.text = charges.ToString();
         }
