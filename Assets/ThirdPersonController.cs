@@ -45,9 +45,18 @@ public class ThirdPersonController : MonoBehaviour
     public SpriteRenderer sprite;
 
     public Vector3 dashRight;
-        public Vector3 dashLeft;
+    public Vector3 dashLeft;
 
-    void Awake() {
+    public LayerMask excludePlayer;
+
+    public bool isFalling;
+
+    public float playerFall;
+
+    public float groundedLeniency;
+
+    void Awake()
+    {
         rb = GetComponent<Rigidbody>();
         ani = modelMesh.GetComponent<Animator>();
 
@@ -57,7 +66,7 @@ public class ThirdPersonController : MonoBehaviour
     void Start()
     {
         playerDirection = transform.forward;
-        distToGround = GetComponent<Collider>().bounds.extents.y;
+        distToGround = GetComponent<Collider>().bounds.extents.y + .01f;
         dashRight = new Vector3(20, 0, 0);
         dashLeft = new Vector3(-20, 0, 0);
     }
@@ -65,14 +74,20 @@ public class ThirdPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        playerFall = rb.linearVelocity.y;
         if (movementVector.x > 0)
         {
             sprite.flipX = false;
         }
         else if (movementVector.x < 0)
         {
-            sprite.flipX = true;   
+            sprite.flipX = true;
+        }
+
+        if (rb.linearVelocity.y < 2 && !dashing && !grounded)
+        {
+            Debug.Log("Falling");
+            rb.AddForce(0, -0.8f, 0, ForceMode.Force);
         }
 
         //dashing = false;
@@ -83,7 +98,21 @@ public class ThirdPersonController : MonoBehaviour
 
 
         //grounded check
-        //grounded = Physics.BoxCast(transform.position + Vector3.up, Vector3.one * 0.5f, Vector3.down, modelMesh.rotation, 0.7f);
+        //grounded = Physics.BoxCast(transform.position + Vector3.up, Vector3.one * 0.5f, Vector3.down, modelMesh.rotation, 0.7f, excludePlayer);
+        //grounded = Physics.BoxCast(transform.position, Vector3.one * 0.5f, Vector3.down, modelMesh.rotation, distToGround, excludePlayer);
+
+        if (Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f))
+        {
+
+            grounded = true;
+            groundedLeniency = 0.3f;
+
+        }
+        else
+        {
+            grounded = false;
+            groundedLeniency -= Time.deltaTime;
+        }
 
         //Flattened versions of the Camera's direction. Removing their y-axis from play
         Vector3 forwardFlat = new Vector3(Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
@@ -114,24 +143,24 @@ public class ThirdPersonController : MonoBehaviour
                     dashing = true;
                     rb.linearVelocity = new Vector3(0, 0, 0);
                     //rb.AddForce(bulletSpawn.forward * 20, ForceMode.Impulse);
-            
-                        if (sprite.flipX == false)
-                        {
-                            Debug.Log("DLEFT");
-                            rb.AddForce(dashRight * 1, ForceMode.Impulse);
-                        }
-                        else if (sprite.flipX == true)
-                        {
-                            Debug.Log("DLEFT");
-                            rb.AddForce(dashLeft * 1, ForceMode.Impulse);
-                        }
-                        
 
-                    
+                    if (sprite.flipX == false)
+                    {
+                        Debug.Log("DLEFT");
+                        rb.AddForce(dashRight * 1, ForceMode.Impulse);
+                    }
+                    else if (sprite.flipX == true)
+                    {
+                        Debug.Log("DLEFT");
+                        rb.AddForce(dashLeft * 1, ForceMode.Impulse);
+                    }
+
+
+
 
                 }
 
-                    
+
             }
             return;
 
@@ -152,59 +181,6 @@ public class ThirdPersonController : MonoBehaviour
             rb.linearVelocity = new Vector3(0, 0, 0);
         }
 
-        if (charges < 1)
-        {
-            
-
-
-        }
-        if (grounded)
-        {
-            if (charges < 1)
-            {
-             AddCD();
-             Debug.Log("addCD");
-             displayText.text = charges.ToString();
-            }
-
-
-        if(grounded)
-        {
-            jumpCharges = 1;
-        }
-        if ((Input.GetKey(KeyCode.A)) || (Input.GetKey(KeyCode.D)))
-        {
-          
-               Stationary = false;
-            
-            
-        }
-        else
-        {
-            if (dashing == false)
-            {
-               Stationary = true;
-            }
-            else
-            {
-
-                Stationary = false;
-                
-            }
-
-        }
-        if (Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f))
-        {
-
-            grounded = true;
-
-
-        }
-        else
-        {
-               grounded = false;
-
-        }
 
         if (dashing == false)
         {
@@ -212,6 +188,64 @@ public class ThirdPersonController : MonoBehaviour
         }
 
 
+        if (charges < 1)
+        {
+
+
+
+        }
+
+        if (grounded)
+        {
+
+            jumpCharges = 1;
+
+            if (charges < 1)
+            {
+                AddCD();
+                Debug.Log("addCD");
+                displayText.text = charges.ToString();
+            }
+
+        }
+
+
+        if ((Input.GetKey(KeyCode.A)) || (Input.GetKey(KeyCode.D)))
+        {
+
+            Stationary = false;
+
+
+        }
+        else
+        {
+            if (dashing == false)
+            {
+                Stationary = true;
+            }
+            else
+            {
+
+                Stationary = false;
+
+            }
+
+        }
+
+
+        //Jumping if SPACE pressed AND we're grounded
+        if (Input.GetKeyDown(KeyCode.Space) && (grounded || jumpCharges > 0 || groundedLeniency > 0))
+        {
+            Vector3 vel = rb.linearVelocity;
+            vel.y = xMovement;
+            rb.linearVelocity = vel;
+            rb.AddForce(0, jumpForce, 0, ForceMode.Impulse);
+            if(groundedLeniency <= 0)
+            {
+               jumpCharges -= 1;
+            }
+            
+        }
 
 
         //Lerping of SPEED towards 0, walkspeed and runspeed, given condition.
@@ -224,8 +258,8 @@ public class ThirdPersonController : MonoBehaviour
         Animation Updates;
         //ani.SetBool("walking?", !Stationary);
         //ani.SetBool("dashing?", dashing);
-    }
 
+    }
     void AddCD()
     {
         charges += 1;
@@ -234,12 +268,14 @@ public class ThirdPersonController : MonoBehaviour
         displayText.text = charges.ToString();
 
     }
-    void FixedUpdate() {
+    void FixedUpdate()
+    {
         //use movementvector and speed to calculate my object's movement this FixedUpdate (0.02 sec)
         //reapply the object's y velocity to retain gravity.
 
         if (dashing == false)
         {
+            Debug.Log("physics updating");
             rb.linearVelocity = (movementVector * speed) + (Vector3.up * rb.linearVelocity.y);
         }
 
@@ -250,16 +286,15 @@ public class ThirdPersonController : MonoBehaviour
             rb.linearVelocity = vel;
 
         }
-        }
-        //Jumping if SPACE pressed AND we're grounded
-        if (Input.GetKeyDown(KeyCode.Space) && grounded2 && jumpCharges > 0) {
-            Vector3 vel = rb.linearVelocity;
-            vel.y = xMovement;
-            rb.linearVelocity = vel;
-            rb.AddForce(0, jumpForce, 0, ForceMode.Impulse);
-            jumpCharges -= 1;
-        }
+
+
     }
+
+
+
+
+
+
 
     void EXAMPLEUHHHHTRACERBLINK()
     {
@@ -287,7 +322,7 @@ public class ThirdPersonController : MonoBehaviour
         }
         if (targetTime <= 0.0f)
         {
-
+            AddCD();
             Debug.Log("addCD");
             displayText.text = charges.ToString();
         }
