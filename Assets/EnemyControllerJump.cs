@@ -258,4 +258,14 @@ public class EnemyControllerJump : MonoBehaviour
         rb.linearVelocity = (movementVector * speed) + (Vector3.up * rb.linearVelocity.y);
 
     }
+    void OnCollisionEnter(Collision collision)
+    {
+
+        if (collision.gameObject.name == "Player")
+        {
+            Debug.Log("HIII");
+            Application.Quit();
+            UnityEditor.EditorApplication.isPlaying = false;
+        }
+    }
 }

@@ -8,12 +8,12 @@ using System;
 public class CoinScript : MonoBehaviour
 {
 
- public float CoinCount = 0;
+
  public TextMeshProUGUI CoinText;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        GetComponentInParent<CoinCounter>();
     }
 
     // Update is called once per frame
@@ -23,8 +23,8 @@ public class CoinScript : MonoBehaviour
     }
     void OnTriggerEnter()
     {
-      CoinCount += 1;
-      CoinText.text = CoinCount.ToString();
+        GetComponentInParent<CoinCounter>().CoinCount += 1;
+      CoinText.text = GetComponentInParent<CoinCounter>().CoinCount.ToString();
       Destroy(gameObject);
 
 

@@ -4,6 +4,12 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/HELL.unity
+    guid: 3a3684cd600f3f041b46b8ae3d8bed46
+  - enabled: 1
+    path: Assets/Scenes/LIMBO.unity
+    guid: 0ba77f2069308534b908d5aa0bd42ec3
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
