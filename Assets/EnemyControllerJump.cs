@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class EnemyControllerJump : MonoBehaviour
 {
@@ -264,8 +265,7 @@ public class EnemyControllerJump : MonoBehaviour
         if (collision.gameObject.name == "Player")
         {
             Debug.Log("HIII");
-            Application.Quit();
-            UnityEditor.EditorApplication.isPlaying = false;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 }
